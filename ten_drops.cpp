@@ -3,6 +3,8 @@
 #include <time.h>
 #include <assert.h>
 
+#define max_layer 3
+
 struct Drop{
     int val[4];
     int sum;
@@ -41,10 +43,10 @@ int is_complete(int (*m)[6]){
     for (int i = 0;i < 6;i++){
         for(int j=0; j < 6;j++){
             if(m[i][j] > 0)
-            return 1;
+            return 0;
         }
     }
-    return 0;
+    return 1;
 
 }
 
@@ -52,10 +54,10 @@ int is_empty(struct Drop (*drops)[8]){
     for (int i = 1; i < 7; i++){
         for (int j = 1; j < 7; j++){
             if (drops[i][j].sum != 0)
-                return 1;
+                return 0;
         }
     }
-    return 0;
+    return 1;
 }
 
 void process_matrix(int row,int col,int (*m)[6]){
@@ -68,7 +70,7 @@ void process_matrix(int row,int col,int (*m)[6]){
         struct Drop next_drops[8][8]= {0};
         m[row-1][col-1] = 0;
         initial_drops(row,col,drops);
-        while(is_empty(drops)){
+        while(!is_empty(drops)){
             //print_drops(drops);
             for (int i = 0; i < 6; i++){
                 for (int j = 0; j < 6; j++){
@@ -154,10 +156,108 @@ void process_matrix(int row,int col,int (*m)[6]){
     }
 }
 
+void matrix_copy(int (*m)[6],int (*m_copy)[6]){
+    for (int i = 0; i < 6; ++i){
+        for (int j = 0; j < 6; ++j){
+            m_copy[i][j] = m[i][j];
+        }
+    }
+}
+
+/*void _tr_copy(int (*tr)[max_layer],int (*tr_copy)[max_layer]){
+    for (int i = 0; i < 2; ++i){
+        for (int j = 0; j < max_layer; ++j){
+            tr_copy[i][j] = tr[i][j];
+        }
+    }
+}*/
+
+
+
+int is_found_sol_leave2root(int (*m)[6],int (*tr)[max_layer+1],int layer){
+    //printf("layer %d \n",layer);
+    int m_copy[6][6] = {0};
+    //int tr_copy[2][max_layer] = {0};
+    int flag = 0;
+    if (layer < max_layer){      
+        for (int row = 1; row < 7; ++row) {
+            for (int col = 1; col < 7; ++col) {
+                matrix_copy(m,m_copy);
+                //_tr_copy(tr,tr_copy);
+
+                if(m_copy[row-1][col-1] == 0){
+                    continue;
+                }
+
+                process_matrix(row,col,m_copy);
+                tr[0][layer] = row;
+                tr[1][layer] = col;
+
+                if (is_complete(m_copy)){
+                    printf(" ----------------------> Better solution: ");
+                    for (int i = 0; i < layer + 1; ++i){
+                        printf(" Layer %d: (%d %d)  ",i,tr[0][i],tr[1][i]);
+                    }
+                    printf("\n");
+                    flag = 1;//return 1;
+                }
+                else if(is_found_sol_leave2root(m_copy,tr,layer+1)){
+                    //printf("Layer %d best location is:(%d %d) \n",layer,row,col);
+                    flag = 1;//return 1;
+                }
+            }
+        }
+        //return 0;
+    }
+    else{
+        for (int row = 1; row < 7; ++row) {
+            for (int col = 1; col < 7; ++col) {
+                matrix_copy(m,m_copy);
+                process_matrix(row,col,m_copy);
+                tr[0][layer] = row;
+                tr[1][layer] = col;
+                if (is_complete(m_copy)){
+                    //printf("Layer %d best location is:(%d %d) \n",layer,row,col);
+                    printf(" Solution: ");
+                    for (int i = 0; i < max_layer+1; ++i){
+                        printf(" Layer %d: (%d %d) ",i,tr[0][i],tr[1][i]);
+                    }
+                    printf("\n");
+                    flag = 1;//return 1;
+                }
+            }
+        }
+        //return 0;
+    }
+    if(flag == 1){
+        return 1;
+    }
+    else{
+        return 0;
+    }  
+}
+
+
+int is_found_sol_root2leave(int (*m)[6],int layer){
+/*
+    int m_copy[6][6] = {0};
+    for (int row = 1; row < 7; ++row) {
+        for (int col = 1; col < 7; ++col) {
+            matrix_copy(m,m_copy);
+            process_matrix(row,col,m_copy);
+            if (is_complete(m_copy)){
+                printf("Layer %d best location is:(%d %d) \n",layer,row,col);
+                return 1;
+            }
+        }
+    }
+    */
+    return 0;
+}
 
 
 int main(){
-    int m[6][6] = {{2,3,2,3,4,4},{4,3,2,2,4,4},{0,1,1,0,4,3},{2,0,4,4,3,2},{4,2,3,2,0,0},{1,0,2,3,3,0}};
+    int m[6][6] = {{3,2,4,2,0,3},{2,0,4,2,0,0},{3,4,3,3,0,4},{3,3,3,3,3,2},{2,2,2,4,1,2},{2,0,2,1,0,2}};
     printf("Input game matrix:\n");
  /*   for (int i = 0; i < 6; i++){
         printf("row %d : \n",i+1);
@@ -170,7 +270,9 @@ int main(){
     printf("\nInitial Matrix: \n");
     print_Matrix(m);
     printf("\n");
-    int times = 0;
+
+
+/*  int times = 0;
     while(is_complete(m)){
         ++times;
         printf("\nInput Element location: \n");
@@ -180,7 +282,9 @@ int main(){
         printf("\nAfter No.%d process: \n",times);
         print_Matrix(m);
     }
-
-    printf("\n Game Over! \n");
+    */
+    int m_copy[6][6] = {0};
+    int tr[2][max_layer+1] = {0};
+    int is_found = is_found_sol_leave2root(m,tr,0);
     return 0;
 }
