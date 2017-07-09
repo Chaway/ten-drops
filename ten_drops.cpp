@@ -3,7 +3,7 @@
 #include <time.h>
 #include <assert.h>
 
-#define max_layer 3
+#define max_layer 2
 
 struct Drop{
     int val[4];
@@ -201,7 +201,10 @@ int is_found_sol_leave2root(int (*m)[6],int (*tr)[max_layer+1],int layer){
                     printf("\n");
                     flag = 1;//return 1;
                 }
-                else if(is_found_sol_leave2root(m_copy,tr,layer+1)){
+                else if (m[row][col] == 4){
+                    continue;
+                }
+                else if (is_found_sol_leave2root(m_copy,tr,layer+1)){
                     //printf("Layer %d best location is:(%d %d) \n",layer,row,col);
                     flag = 1;//return 1;
                 }
