@@ -201,7 +201,7 @@ int is_found_sol_leave2root(int (*m)[6],int (*tr)[max_layer+1],int layer){
                     printf("\n");
                     flag = 1;//return 1;
                 }
-                else if (m[row][col] == 4){
+                else if (m[row-1][col-1] == 4){
                     continue;
                 }
                 else if (is_found_sol_leave2root(m_copy,tr,layer+1)){
@@ -260,7 +260,7 @@ int is_found_sol_root2leave(int (*m)[6],int layer){
 
 
 int main(){
-    int m[6][6] = {{3,2,4,2,0,3},{2,0,4,2,0,0},{3,4,3,3,0,4},{3,3,3,3,3,2},{2,2,2,4,1,2},{2,0,2,1,0,2}};
+    int m[6][6] = {{2,4,2,3,0,3},{1,3,4,1,0,3},{3,4,3,4,3,0},{3,0,0,4,2,3},{0,1,4,2,3,4},{4,2,1,1,1,0}};
     printf("Input game matrix:\n");
  /*   for (int i = 0; i < 6; i++){
         printf("row %d : \n",i+1);
