@@ -3,7 +3,7 @@
 #include <time.h>
 #include <assert.h>
 
-#define max_layer 5
+#define max_layer 7
 
 struct Drop{
     int val[4];
@@ -182,6 +182,9 @@ int is_found_sol_leave2root(int (*m)[6],int (*tr)[max_layer+1],int layer){
     if (layer < max_layer){      
         for (int row = 1; row < 7; ++row) {
             for (int col = 1; col < 7; ++col) {
+		    if (layer == 0){
+              		    printf("Searching root first layer: (%d %d) \n",row,col);
+		    }
                 matrix_copy(m,m_copy);
                 //_tr_copy(tr,tr_copy);
 
@@ -260,7 +263,7 @@ int is_found_sol_root2leave(int (*m)[6],int layer){
 
 
 int main(){
-    int m[6][6] = {{2,2,2,2,4,1},{4,2,0,0,1,0},{2,3,0,3,4,4},{4,0,2,2,1,3},{3,3,2,0,2,3},{2,1,4,0,2,3}};
+    int m[6][6] = {{0,2,0,1,2,1},{4,3,0,3,3,0},{2,1,3,3,2,3},{0,0,0,4,1,2},{0,1,1,4,2,2},{1,1,4,4,2,1}};
     printf("Input game matrix:\n");
  /*   for (int i = 0; i < 6; i++){
         printf("row %d : \n",i+1);
